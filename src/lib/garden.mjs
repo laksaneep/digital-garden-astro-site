@@ -9,7 +9,13 @@ export async function getNotes() {
       section: note.id.includes("/") ? note.id.split("/")[0] : "unfiled",
       slug: note.id.split("/").pop().replace(/\.md$/, ""),
     }))
-    .sort((a, b) => b.data.created - a.data.created);
+    // Title breaks ties: notes written the same day would otherwise order
+    // differently between builds, producing noisy diffs in the output.
+    .sort(
+      (a, b) =>
+        b.data.created - a.data.created ||
+        a.data.title.localeCompare(b.data.title),
+    );
 }
 
 /** Section names with note counts, biggest first. */
