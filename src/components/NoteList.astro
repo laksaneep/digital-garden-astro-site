@@ -8,16 +8,28 @@ const groups = byMonth(notes);
 {
   groups.map((group) => (
     <>
-      <p class="month">{group.label}</p>
+      <p class="text-faint mt-6 font-mono text-[11px] leading-6 tracking-[0.11em] uppercase">
+        {group.label}
+      </p>
       {group.notes.map((note) => (
-        <a class="row" href={`/notes/${note.slug}`}>
-          <span class="rt">{note.data.title}</span>
-          <span class="rmeta">
+        <a
+          class="border-line-soft text-ink group flex min-h-12 items-baseline justify-between gap-[18px] border-b py-3 no-underline"
+          href={`/notes/${note.slug}`}
+        >
+          <span class="note-title text-[15.5px] group-hover:text-accent">
+            {note.data.title}
+          </span>
+          <span class="flex flex-none items-baseline gap-[7px]">
             {note.data.tags.map((tag) => (
-              <span class="tag">{tag}</span>
+              <span class="text-muted bg-sunk border-line-soft border px-[7px] py-px font-mono text-[11px] max-[520px]:hidden">
+                {tag}
+              </span>
             ))}
-            <span class="date">
-              {note.data.created.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
+            <span class="text-faint font-mono text-xs whitespace-nowrap tabular-nums">
+              {note.data.created.toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "short",
+              })}
             </span>
           </span>
         </a>

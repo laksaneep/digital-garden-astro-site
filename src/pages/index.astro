@@ -12,20 +12,32 @@ const recent = notes.slice(0, 10);
   title="What I've learned today"
   description="A garden of small things I've figured out."
 >
-  <h1>A garden of small things I've figured out.</h1>
-  <p class="lede">
+  <h1
+    class="font-display mt-12 mb-6 text-[32px] leading-12 font-semibold tracking-[-0.02em] text-balance max-[520px]:text-[26px]"
+  >
+    A garden of small things I've figured out.
+  </h1>
+  <p class="text-muted mb-12 max-w-[54ch]">
     Mostly frontend, sometimes backend, occasionally something I'll need to
     relearn next year. Nothing here is finished.
   </p>
 
   {
     sections.length > 0 && (
-      <section>
-        <p class="eyebrow">Sections</p>
-        <div class="chips">
+      <section class="mb-12">
+        <p class="text-faint mb-3 font-mono text-[11px] leading-6 tracking-[0.11em] uppercase">
+          Sections
+        </p>
+        <div class="flex flex-wrap gap-2">
           {sections.map((section) => (
-            <a class="chip" href={`/notes`}>
-              {titleCase(section.name)} <b>{section.count}</b>
+            <a
+              class="bg-raised text-ink border-line hover:border-accent hover:text-accent group flex h-10 items-center gap-2 border px-3.5 text-sm no-underline"
+              href="/notes"
+            >
+              {titleCase(section.name)}
+              <b class="text-muted group-hover:text-accent font-mono text-[12.5px] font-medium tabular-nums">
+                {section.count}
+              </b>
             </a>
           ))}
         </div>
@@ -33,20 +45,26 @@ const recent = notes.slice(0, 10);
     )
   }
 
-  <section>
-    <div class="count">
-      <b>{notes.length}</b>
-      <span>{notes.length === 1 ? "note planted so far" : "notes planted so far"}</span>
+  <section class="mb-12">
+    <div class="bg-sunk border-line flex items-baseline gap-2.5 border px-4.5 py-3">
+      <b class="font-display text-[28px] leading-6 font-semibold tabular-nums">
+        {notes.length}
+      </b>
+      <span class="text-muted text-sm">
+        {notes.length === 1 ? "note planted so far" : "notes planted so far"}
+      </span>
     </div>
   </section>
 
-  <section>
-    <p class="eyebrow">Recently</p>
+  <section class="mb-12">
+    <p class="text-faint mb-3 font-mono text-[11px] leading-6 tracking-[0.11em] uppercase">
+      Recently
+    </p>
     {
       recent.length > 0 ? (
         <NoteList notes={recent} />
       ) : (
-        <p class="empty">
+        <p class="text-muted m-0 text-[14.5px]">
           Nothing published yet. Add a note with <code>published: true</code>.
         </p>
       )

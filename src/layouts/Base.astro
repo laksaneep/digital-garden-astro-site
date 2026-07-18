@@ -1,8 +1,13 @@
 ---
 import "../styles/global.css";
+import { cn } from "../lib/utils";
 
 const { title, description } = Astro.props;
 const path = Astro.url.pathname;
+
+const navLink =
+  "flex h-8 items-center px-2.5 text-sm text-muted no-underline hover:text-accent";
+const navLinkActive = "text-ink shadow-[inset_0_-2px_0_var(--accent)]";
 ---
 
 <!doctype html>
@@ -30,24 +35,30 @@ const path = Astro.url.pathname;
     </script>
   </head>
   <body>
-    <div class="wrap">
-      <header>
-        <a class="brand" href="/">what i've learned today</a>
-        <hr />
-        <nav>
+    <div class="mx-auto max-w-[1080px] px-6 pb-24">
+      <header
+        class="border-line flex h-18 flex-wrap items-center justify-between gap-4 border-b"
+      >
+        <a
+          class="font-display text-ink text-[17px] font-semibold tracking-[-0.01em] no-underline"
+          href="/">what i've learned today</a
+        >
+        <hr class="border-line-soft m-0 flex-1 border-0 border-t" />
+        <nav class="flex items-center gap-1">
           <a
             href="/notes"
+            class={cn(navLink, path.startsWith("/notes") && navLinkActive)}
             aria-current={path.startsWith("/notes") ? "page" : undefined}
             >notes</a
           >
           <button
             id="theme-toggle"
-            class="theme-toggle"
             type="button"
             aria-label="Switch theme"
+            class="bg-raised border-line text-muted hover:border-accent hover:text-accent ml-1 flex size-8 cursor-pointer items-center justify-center border p-0"
           >
             <svg
-              class="icon-moon"
+              class="icon-moon block size-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -59,7 +70,7 @@ const path = Astro.url.pathname;
               <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
             </svg>
             <svg
-              class="icon-sun"
+              class="icon-sun hidden size-4"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -80,6 +91,27 @@ const path = Astro.url.pathname;
         <slot />
       </main>
     </div>
+
+    {
+      /* Show the icon for the theme you'd switch *to*, so the button reads as
+         an action. Driven by the same signals as the palette above. */
+    }
+    <style is:global>
+      :root[data-theme="dark"] .icon-sun {
+        display: block;
+      }
+      :root[data-theme="dark"] .icon-moon {
+        display: none;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme]) .icon-sun {
+          display: block;
+        }
+        :root:not([data-theme]) .icon-moon {
+          display: none;
+        }
+      }
+    </style>
 
     <script is:inline>
       (() => {

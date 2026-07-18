@@ -1,8 +1,20 @@
+@import "tailwindcss";
+
 /* Grid notebook theme.
    The one rule that matters: type sits on the grid. --cell is 24px, body
-   line-height is exactly 24px, headings 48px, spacing in multiples. Break that
-   and the background stops being paper and becomes wallpaper. */
+   line-height is exactly 24px, headings 48px, spacing in multiples. In Tailwind
+   terms that's leading-6, with margins on the 6 / 12 steps. Break that and the
+   background stops being paper and becomes wallpaper. */
 
+/* ─── Runtime palette ───────────────────────────────────────
+   Plain CSS variables, not @theme tokens, because they must be swappable at
+   runtime. The cascade is deliberate:
+     :root                        light, the default
+     @media prefers-color-scheme  follows the OS
+     [data-theme]                 the toggle, wins over both
+   Keep all four blocks in sync — a value set in only one of them produces a
+   site that changes appearance the first time someone clicks the toggle.
+   ------------------------------------------------------------ */
 :root {
   --cell: 24px;
   --ground: #fcfbf7;
@@ -12,17 +24,11 @@
   --grid-major: #f2ebe6;
   --ink: #7e574e;
   --muted: #847a70;
-  --faint: #aba396;
+  --faint: #938c82;
   --accent: #d8623c;
   --accent-soft: #f0d8cd;
   --line: #d9dfe7;
   --line-soft: #e6eaef;
-
-  --display:
-    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", -apple-system,
-    "Segoe UI", system-ui, sans-serif;
-  --body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-  --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -72,368 +78,137 @@
   --line-soft: #e6eaef;
 }
 
-* {
-  box-sizing: border-box;
+/* ─── Design tokens ─────────────────────────────────────────
+   `inline` is load-bearing: it makes utilities resolve var(--ink) at the point
+   of use rather than baking in the value, so the runtime overrides above still
+   apply. Without it, bg-ground would freeze to the light value and the theme
+   toggle would stop working.
+   ------------------------------------------------------------ */
+@theme inline {
+  --color-ground: var(--ground);
+  --color-raised: var(--raised);
+  --color-sunk: var(--sunk);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-line: var(--line);
+  --color-line-soft: var(--line-soft);
+  --color-grid: var(--grid);
+  --color-grid-major: var(--grid-major);
+
+  --font-display:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", -apple-system,
+    "Segoe UI", system-ui, sans-serif;
+  --font-body:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 
-body {
-  margin: 0;
-  color: var(--ink);
-  font-family: var(--body);
-  font-size: 16px;
-  line-height: var(--cell);
-  -webkit-font-smoothing: antialiased;
-  background-color: var(--ground);
-  background-image:
-    linear-gradient(var(--grid-major) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
-    linear-gradient(var(--grid) 1px, transparent 1px),
-    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
-  background-size:
-    calc(var(--cell) * 5) calc(var(--cell) * 5),
-    calc(var(--cell) * 5) calc(var(--cell) * 5),
-    var(--cell) var(--cell),
-    var(--cell) var(--cell);
-  background-position: -1px -1px;
-}
-
-.wrap {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 24px 96px;
-}
-
-/* header */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  height: 72px;
-  border-bottom: 1px solid var(--line);
-  flex-wrap: wrap;
-}
-/* The rule between the wordmark and the nav, filling the gap between them. */
-header hr {
-  flex: 1;
-  border: 0;
-  border-top: 1px solid var(--line-soft);
-  margin: 0;
-}
-.brand {
-  font-family: var(--display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--ink);
-  text-decoration: none;
-}
-nav {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-nav a {
-  font-size: 14px;
-  color: var(--muted);
-  text-decoration: none;
-  padding: 0 10px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-}
-nav a:hover {
-  color: var(--accent);
-}
-nav a[aria-current="page"] {
-  color: var(--ink);
-  box-shadow: inset 0 -2px 0 var(--accent);
-}
-
-/* theme toggle */
-.theme-toggle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  margin-left: 4px;
-  padding: 0;
-  background: var(--raised);
-  border: 1px solid var(--line);
-  border-radius: 0;
-  color: var(--muted);
-  cursor: pointer;
-}
-.theme-toggle:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.theme-toggle svg {
-  width: 16px;
-  height: 16px;
-  display: block;
-}
-/* Show the icon for the theme you'd switch *to*, so the button reads as an action. */
-.theme-toggle .icon-sun {
-  display: none;
-}
-:root[data-theme="dark"] .theme-toggle .icon-sun {
-  display: block;
-}
-:root[data-theme="dark"] .theme-toggle .icon-moon {
-  display: none;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .theme-toggle .icon-sun {
-    display: block;
+/* ─── Base ──────────────────────────────────────────────────
+   The paper. Four gradient layers: a major rule every 5 cells over the minor
+   grid. Not expressible as a utility, so it stays here.
+   ------------------------------------------------------------ */
+@layer base {
+  body {
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: var(--cell);
+    -webkit-font-smoothing: antialiased;
+    background-color: var(--ground);
+    background-image:
+      linear-gradient(var(--grid-major) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px),
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size:
+      calc(var(--cell) * 5) calc(var(--cell) * 5),
+      calc(var(--cell) * 5) calc(var(--cell) * 5),
+      var(--cell) var(--cell),
+      var(--cell) var(--cell);
+    background-position: -1px -1px;
   }
-  :root:not([data-theme]) .theme-toggle .icon-moon {
-    display: none;
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 
-/* type */
-h1 {
-  font-family: var(--display);
-  font-size: 32px;
-  line-height: 48px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  margin: 48px 0 24px;
-  text-wrap: balance;
-}
-.lede {
-  color: var(--muted);
-  margin: 0 0 48px;
-  max-width: 54ch;
-}
-.eyebrow {
-  font-family: var(--mono);
-  font-size: 11px;
-  line-height: 24px;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin: 0 0 12px;
-}
-section {
-  margin: 0 0 48px;
-}
-
-/* section map */
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.chip {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  height: 40px;
-  background: var(--raised);
-  color: var(--ink);
-  border: 1px solid var(--line);
-  padding: 0 14px;
-  text-decoration: none;
-}
-.chip:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
-.chip b {
-  font-family: var(--mono);
-  font-size: 12.5px;
-  font-weight: 500;
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-}
-.chip:hover b {
-  color: var(--accent);
-}
-
-.count {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  background: var(--sunk);
-  border: 1px solid var(--line);
-  padding: 12px 18px;
-}
-.count b {
-  font-family: var(--display);
-  font-size: 28px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 24px;
-}
-.count span {
-  font-size: 14px;
-  color: var(--muted);
-}
-
-/* note list */
-.month {
-  font-family: var(--mono);
-  font-size: 11px;
-  line-height: 24px;
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
-  color: var(--faint);
-  margin: 24px 0 0;
-}
-.row {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 18px;
-  min-height: 48px;
-  padding: 12px 0;
-  border-bottom: 1px solid var(--line-soft);
-  text-decoration: none;
-  color: var(--ink);
-}
-.rt {
-  font-size: 15.5px;
-  position: relative;
-  display: inline-block;
-}
-.row:hover .rt {
-  color: var(--accent);
-}
-.row:hover .rt::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -2px;
-  height: 6px;
-  background-color: var(--accent);
-  -webkit-mask: no-repeat center/100% 100%
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 6' preserveAspectRatio='none'><path d='M1 4.2C22 1.6 47 1.2 68 3c17 1.5 34 1.6 51 .2' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
-  mask: no-repeat center/100% 100%
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 6' preserveAspectRatio='none'><path d='M1 4.2C22 1.6 47 1.2 68 3c17 1.5 34 1.6 51 .2' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
-}
-.rmeta {
-  display: flex;
-  align-items: baseline;
-  gap: 7px;
-  flex: none;
-}
-.tag {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--muted);
-  background: var(--sunk);
-  border: 1px solid var(--line-soft);
-  padding: 1px 7px;
-}
-.date {
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--faint);
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-/* note body */
-.prose {
-  margin-bottom: 48px;
-}
-.prose p {
-  margin: 0 0 24px;
-}
-.prose ul,
-.prose ol {
-  margin: 0 0 24px;
-  padding-left: 24px;
-}
-.prose li {
-  margin-bottom: 4px;
-}
-.prose code {
-  font-family: var(--mono);
-  font-size: 13.5px;
-  background: var(--sunk);
-  padding: 1px 5px;
-}
-.prose pre {
-  background: var(--sunk);
-  border: 1px solid var(--line);
-  padding: 12px 16px;
-  overflow-x: auto;
-  margin: 0 0 24px;
-}
-.prose pre code {
-  background: none;
-  padding: 0;
-}
-.prose a,
-.wl {
-  color: var(--accent);
-  text-decoration: none;
-  border-bottom: 1px solid var(--accent-soft);
-}
-.prose a:hover,
-.wl:hover {
-  border-bottom-color: var(--accent);
-}
-.callout {
-  border: 1px solid var(--accent-soft);
-  background: var(--sunk);
-  padding: 12px 16px;
-  margin: 0 0 24px;
-  box-shadow: inset 3px 0 0 var(--accent);
-}
-.callout p {
-  margin: 0;
-}
-.callout .clabel {
-  font-family: var(--display);
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--accent);
-}
-.amet {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin: 0 0 48px;
-}
-.links {
-  border-top: 1px solid var(--line);
-  margin-top: 48px;
-  padding-top: 24px;
-}
-.back {
-  display: inline-block;
-  font-size: 14px;
-  color: var(--muted);
-  text-decoration: none;
-  margin-top: 24px;
-}
-.back:hover {
-  color: var(--accent);
-}
-.empty {
-  color: var(--muted);
-  font-size: 14.5px;
-  margin: 0;
-}
-
-a:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-@media (max-width: 520px) {
-  h1 {
-    font-size: 26px;
+/* ─── Components ────────────────────────────────────────────
+   Only two kinds of thing belong here:
+     1. markdown output from remark — we don't author that HTML, so we can't put
+        utility classes on it and have to style by element
+     2. the hand-drawn underline, a masked pseudo-element
+   Everything else is utilities in the .astro files.
+   ------------------------------------------------------------ */
+@layer components {
+  .note-title {
+    position: relative;
+    display: inline-block;
   }
-  .rmeta .tag {
-    display: none;
+  .group:hover .note-title::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -2px;
+    height: 6px;
+    background-color: var(--accent);
+    -webkit-mask: no-repeat center/100% 100%
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 6' preserveAspectRatio='none'><path d='M1 4.2C22 1.6 47 1.2 68 3c17 1.5 34 1.6 51 .2' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
+    mask: no-repeat center/100% 100%
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 6' preserveAspectRatio='none'><path d='M1 4.2C22 1.6 47 1.2 68 3c17 1.5 34 1.6 51 .2' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round'/></svg>");
+  }
+
+  /* markdown body */
+  .prose {
+    @apply mb-12;
+  }
+  .prose p {
+    @apply mb-6;
+  }
+  .prose ul,
+  .prose ol {
+    @apply mb-6 pl-6;
+  }
+  .prose ul {
+    @apply list-disc;
+  }
+  .prose ol {
+    @apply list-decimal;
+  }
+  .prose li {
+    @apply mb-1;
+  }
+  .prose code {
+    @apply bg-sunk px-[5px] py-px font-mono text-[13.5px];
+  }
+  .prose pre {
+    @apply border-line bg-sunk mb-6 overflow-x-auto border px-4 py-3;
+  }
+  .prose pre code {
+    @apply bg-transparent p-0;
+  }
+  .prose a,
+  .wl {
+    @apply text-accent border-accent-soft border-b no-underline;
+  }
+  .prose a:hover,
+  .wl:hover {
+    @apply border-accent;
+  }
+
+  .callout {
+    @apply border-accent-soft bg-sunk mb-6 border px-4 py-3;
+    box-shadow: inset 3px 0 0 var(--accent);
+  }
+  .callout p {
+    @apply mb-0;
+  }
+  .callout .clabel {
+    @apply text-accent font-display text-sm font-semibold;
   }
 }
