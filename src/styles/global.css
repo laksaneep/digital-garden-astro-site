@@ -8,9 +8,9 @@
   --ground: #fcfbf7;
   --raised: #ffffff;
   --sunk: rgba(47, 42, 38, 0.045);
-  --grid: #dce4ec;
-  --grid-major: #c3d0de;
-  --ink: #2f2a26;
+  --grid: #f8f3ef;
+  --grid-major: #f2ebe6;
+  --ink: #7e574e;
   --muted: #847a70;
   --faint: #aba396;
   --accent: #d8623c;
@@ -18,8 +18,9 @@
   --line: #d9dfe7;
   --line-soft: #e6eaef;
 
-  --display: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN",
-    -apple-system, "Segoe UI", system-ui, sans-serif;
+  --display:
+    ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", -apple-system,
+    "Segoe UI", system-ui, sans-serif;
   --body: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -29,9 +30,9 @@
     --ground: #15181c;
     --raised: #1c2026;
     --sunk: rgba(255, 255, 255, 0.05);
-    --grid: #232a32;
-    --grid-major: #2e3741;
-    --ink: #e8e4dc;
+    --grid: #1c1a1a;
+    --grid-major: #241f1e;
+    --ink: #e2d7d5;
     --muted: #9a958c;
     --faint: #6b665e;
     --accent: #f08a64;
@@ -45,9 +46,9 @@
   --ground: #15181c;
   --raised: #1c2026;
   --sunk: rgba(255, 255, 255, 0.05);
-  --grid: #232a32;
-  --grid-major: #2e3741;
-  --ink: #e8e4dc;
+  --grid: #1c1a1a;
+  --grid-major: #241f1e;
+  --ink: #e2d7d5;
   --muted: #9a958c;
   --faint: #6b665e;
   --accent: #f08a64;
@@ -60,11 +61,11 @@
   --ground: #fcfbf7;
   --raised: #ffffff;
   --sunk: rgba(47, 42, 38, 0.045);
-  --grid: #dce4ec;
-  --grid-major: #c3d0de;
-  --ink: #2f2a26;
+  --grid: #f8f3ef;
+  --grid-major: #f2ebe6;
+  --ink: #7e574e;
   --muted: #847a70;
-  --faint: #aba396;
+  --faint: #938c82;
   --accent: #d8623c;
   --accent-soft: #f0d8cd;
   --line: #d9dfe7;
@@ -97,7 +98,7 @@ body {
 }
 
 .wrap {
-  max-width: 680px;
+  max-width: 1080px;
   margin: 0 auto;
   padding: 0 24px 96px;
 }
@@ -109,8 +110,15 @@ header {
   justify-content: space-between;
   gap: 16px;
   height: 72px;
-  border-bottom: 1px solid var(--grid-major);
+  border-bottom: 1px solid var(--line);
   flex-wrap: wrap;
+}
+/* The rule between the wordmark and the nav, filling the gap between them. */
+header hr {
+  flex: 1;
+  border: 0;
+  border-top: 1px solid var(--line-soft);
+  margin: 0;
 }
 .brand {
   font-family: var(--display);
@@ -140,6 +148,49 @@ nav a:hover {
 nav a[aria-current="page"] {
   color: var(--ink);
   box-shadow: inset 0 -2px 0 var(--accent);
+}
+
+/* theme toggle */
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin-left: 4px;
+  padding: 0;
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  color: var(--muted);
+  cursor: pointer;
+}
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+/* Show the icon for the theme you'd switch *to*, so the button reads as an action. */
+.theme-toggle .icon-sun {
+  display: none;
+}
+:root[data-theme="dark"] .theme-toggle .icon-sun {
+  display: block;
+}
+:root[data-theme="dark"] .theme-toggle .icon-moon {
+  display: none;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .theme-toggle .icon-sun {
+    display: block;
+  }
+  :root:not([data-theme]) .theme-toggle .icon-moon {
+    display: none;
+  }
 }
 
 /* type */
@@ -353,7 +404,7 @@ section {
   margin: 0 0 48px;
 }
 .links {
-  border-top: 1px solid var(--grid-major);
+  border-top: 1px solid var(--line);
   margin-top: 48px;
   padding-top: 24px;
 }

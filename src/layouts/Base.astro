@@ -13,19 +13,110 @@ const path = Astro.url.pathname;
     <meta name="color-scheme" content="light dark" />
     <title>{title}</title>
     {description && <meta name="description" content={description} />}
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🌱</text></svg>" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='14' font-size='14'>🌱</text></svg>"
+    />
+    {
+      /* Runs before first paint so a saved theme never flashes the wrong one. */
+    }
+    <script is:inline>
+      (() => {
+        const saved = localStorage.getItem("theme");
+        if (saved === "light" || saved === "dark") {
+          document.documentElement.dataset.theme = saved;
+        }
+      })();
+    </script>
   </head>
   <body>
     <div class="wrap">
       <header>
         <a class="brand" href="/">what i've learned today</a>
+        <hr />
         <nav>
-          <a href="/notes" aria-current={path.startsWith("/notes") ? "page" : undefined}>notes</a>
+          <a
+            href="/notes"
+            aria-current={path.startsWith("/notes") ? "page" : undefined}
+            >notes</a
+          >
+          <button
+            id="theme-toggle"
+            class="theme-toggle"
+            type="button"
+            aria-label="Switch theme"
+          >
+            <svg
+              class="icon-moon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path>
+            </svg>
+            <svg
+              class="icon-sun"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="4"></circle>
+              <path
+                d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"
+              ></path>
+            </svg>
+          </button>
         </nav>
       </header>
       <main>
         <slot />
       </main>
     </div>
+
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        const button = document.getElementById("theme-toggle");
+
+        const active = () =>
+          root.dataset.theme ||
+          (matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light");
+
+        const label = () =>
+          button.setAttribute(
+            "aria-label",
+            active() === "dark"
+              ? "Switch to light theme"
+              : "Switch to dark theme",
+          );
+
+        button.addEventListener("click", () => {
+          const next = active() === "dark" ? "light" : "dark";
+          root.dataset.theme = next;
+          localStorage.setItem("theme", next);
+          label();
+        });
+
+        // Follow the OS until the user makes an explicit choice.
+        matchMedia("(prefers-color-scheme: dark)").addEventListener(
+          "change",
+          () => {
+            if (!localStorage.getItem("theme")) label();
+          },
+        );
+
+        label();
+      })();
+    </script>
   </body>
 </html>
