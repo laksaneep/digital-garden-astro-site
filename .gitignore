@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+
+# Notes are copied in from the garden repo at build time — never committed here.
+src/content/notes/

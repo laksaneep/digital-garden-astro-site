@@ -1,0 +1,19 @@
+---
+import Base from "../../layouts/Base.astro";
+import NoteList from "../../components/NoteList.astro";
+import { getNotes } from "../../lib/garden.mjs";
+
+const notes = await getNotes();
+---
+
+<Base title="All notes — What I've learned today">
+  <h1>All notes</h1>
+  <p class="lede">Everything in the garden, newest first.</p>
+  {
+    notes.length > 0 ? (
+      <NoteList notes={notes} />
+    ) : (
+      <p class="empty">Nothing published yet.</p>
+    )
+  }
+</Base>

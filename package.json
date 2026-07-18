@@ -1,0 +1,17 @@
+{
+  "name": "digital-garden-astro-site",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "sync": "node scripts/sync-notes.mjs",
+    "dev": "npm run sync && astro dev",
+    "build": "npm run clean && npm run sync && astro build",
+    "preview": "astro preview",
+    "clean": "rm -rf dist .astro node_modules/.astro"
+  },
+  "dependencies": {
+    "astro": "^5.13.0",
+    "unist-util-visit": "^5.1.0"
+  }
+}

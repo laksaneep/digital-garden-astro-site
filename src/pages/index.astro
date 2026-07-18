@@ -1,0 +1,55 @@
+---
+import Base from "../layouts/Base.astro";
+import NoteList from "../components/NoteList.astro";
+import { getNotes, sectionCounts, titleCase } from "../lib/garden.mjs";
+
+const notes = await getNotes();
+const sections = sectionCounts(notes);
+const recent = notes.slice(0, 10);
+---
+
+<Base
+  title="What I've learned today"
+  description="A garden of small things I've figured out."
+>
+  <h1>A garden of small things I've figured out.</h1>
+  <p class="lede">
+    Mostly frontend, sometimes backend, occasionally something I'll need to
+    relearn next year. Nothing here is finished.
+  </p>
+
+  {
+    sections.length > 0 && (
+      <section>
+        <p class="eyebrow">Sections</p>
+        <div class="chips">
+          {sections.map((section) => (
+            <a class="chip" href={`/notes`}>
+              {titleCase(section.name)} <b>{section.count}</b>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <section>
+    <div class="count">
+      <b>{notes.length}</b>
+      <span>{notes.length === 1 ? "note planted so far" : "notes planted so far"}</span>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Recently</p>
+    {
+      recent.length > 0 ? (
+        <NoteList notes={recent} />
+      ) : (
+        <p class="empty">
+          Nothing published yet. Add a note with <code>published: true</code>.
+        </p>
+      )
+    }
+  </section>
+</Base>

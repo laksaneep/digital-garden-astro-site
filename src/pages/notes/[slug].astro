@@ -1,0 +1,51 @@
+---
+import { render } from "astro:content";
+import Base from "../../layouts/Base.astro";
+import { getNotes, backlinksTo } from "../../lib/garden.mjs";
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return notes.map((note) => ({
+    params: { slug: note.slug },
+    props: { note, notes },
+  }));
+}
+
+const { note, notes } = Astro.props;
+const { Content } = await render(note);
+const backlinks = backlinksTo(note, notes);
+---
+
+<Base title={`${note.data.title} — What I've learned today`}>
+  <article>
+    <h1>{note.data.title}</h1>
+    <div class="amet">
+      <span class="date">{note.data.created.toISOString().slice(0, 10)}</span>
+      {note.data.tags.map((tag) => <span class="tag">{tag}</span>)}
+    </div>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <div class="links">
+      <p class="eyebrow">Linked from</p>
+      {
+        backlinks.length > 0 ? (
+          backlinks.map((other) => (
+            <a class="row" href={`/notes/${other.slug}`}>
+              <span class="rt">{other.data.title}</span>
+              <span class="date">
+                {other.data.created.toLocaleDateString("en-GB", { day: "2-digit", month: "short" })}
+              </span>
+            </a>
+          ))
+        ) : (
+          <p class="empty">Nothing links here yet.</p>
+        )
+      }
+    </div>
+
+    <a class="back" href="/notes">← all notes</a>
+  </article>
+</Base>
