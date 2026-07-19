@@ -1,0 +1,49 @@
+name: Deploy
+
+on:
+  # Fired by the digital-garden repo whenever a note changes.
+  repository_dispatch:
+    types: [garden-updated]
+  # Site code changes.
+  push:
+    branches: [main]
+  # Manual re-run from the Actions tab.
+  workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the site
+        uses: actions/checkout@v4
+
+      - name: Check out the garden (private notes repo)
+        uses: actions/checkout@v4
+        with:
+          repository: laksaneep/digital-garden
+          token: ${{ secrets.GARDEN_TOKEN }}
+          path: garden
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # GARDEN_DIR overrides the local default in scripts/sync-notes.mjs.
+      - name: Build
+        run: npm run build
+        env:
+          GARDEN_DIR: ${{ github.workspace }}/garden
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=what-i-have-learned

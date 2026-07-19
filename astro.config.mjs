@@ -4,7 +4,7 @@ import { remarkWikilinks } from "./src/lib/wikilinks.mjs";
 import { remarkCallouts } from "./src/lib/callouts.mjs";
 
 export default defineConfig({
-  site: "https://digital-garden.pages.dev",
+  site: "https://what-i-have-learned.pages.dev",
   vite: {
     plugins: [tailwindcss()],
   },
