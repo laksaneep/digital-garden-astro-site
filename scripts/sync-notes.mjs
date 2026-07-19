@@ -1,7 +1,7 @@
 import { cp, mkdir, rm, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { homedir } from "node:os";
-import { join } from "node:path";
+import { join, relative, sep } from "node:path";
 
 // Where the notes come from. CI overrides this with GARDEN_DIR.
 const source =
@@ -18,9 +18,17 @@ if (!existsSync(source)) {
 
 await rm(dest, { recursive: true, force: true });
 await mkdir(dest, { recursive: true });
+// Skip anything dot-prefixed: .git, .github, .obsidian, .DS_Store. Tested on the
+// path *relative to the source*, so a dot in a parent directory can't wipe out
+// the whole copy.
+const isHidden = (src) =>
+  relative(source, src)
+    .split(sep)
+    .some((segment) => segment.startsWith("."));
+
 await cp(source, dest, {
   recursive: true,
-  filter: (src) => !/(^|\/)(\.git|\.obsidian|\.DS_Store)(\/|$)/.test(src),
+  filter: (src) => !isHidden(src),
 });
 
 const sections = (await readdir(dest, { withFileTypes: true }))
