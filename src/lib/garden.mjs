@@ -65,6 +65,67 @@ export function byMonth(notes) {
   return groups;
 }
 
+/**
+ * Build a GitHub-style activity calendar from note creation dates: the trailing
+ * `weeks` weeks up to today, as whole Sun→Sat columns. Returns the week columns
+ * (each 7 days), month labels positioned by column, and the busiest-day count.
+ * Dates are handled in local time so a day never lands in the wrong column.
+ */
+export function activityCalendar(notes, weeks = 53) {
+  const ymd = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+
+  const counts = new Map();
+  for (const note of notes) {
+    const key = ymd(note.data.created);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  // End on the Saturday of the current week so every column is a full week.
+  const end = new Date(today);
+  end.setDate(end.getDate() + (6 - end.getDay()));
+  const cursor = new Date(end);
+  cursor.setDate(cursor.getDate() - (weeks * 7 - 1));
+
+  let max = 0;
+  const columns = [];
+  for (let w = 0; w < weeks; w++) {
+    const days = [];
+    for (let d = 0; d < 7; d++) {
+      const key = ymd(cursor);
+      const count = counts.get(key) ?? 0;
+      max = Math.max(max, count);
+      days.push({ date: key, count, future: cursor > today });
+      cursor.setDate(cursor.getDate() + 1);
+    }
+    columns.push(days);
+  }
+
+  // A month label sits on the first column that opens a new month.
+  const monthLabels = [];
+  let lastMonth = -1;
+  columns.forEach((week, col) => {
+    const first = new Date(`${week[0].date}T00:00:00`);
+    if (first.getMonth() !== lastMonth) {
+      monthLabels.push({
+        col,
+        label: first.toLocaleDateString("en-GB", { month: "short" }),
+      });
+      lastMonth = first.getMonth();
+    }
+  });
+
+  // The window opens mid-month, so its first label sits only a column or two
+  // before the next one and the two collide. Drop it, like GitHub does.
+  if (monthLabels.length > 1 && monthLabels[1].col - monthLabels[0].col < 3) {
+    monthLabels.shift();
+  }
+
+  return { columns, monthLabels, max };
+}
+
 /** Notes whose body links to this one, via [[wikilink]]. */
 export function backlinksTo(note, notes) {
   const needle = `[[${note.data.title}`;

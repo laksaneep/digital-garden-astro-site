@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import NoteList from "../components/NoteList.astro";
+import Heatmap from "../components/Heatmap.astro";
 import { getNotes, sectionCounts, titleCase } from "../lib/garden.mjs";
 
 const notes = await getNotes();
@@ -54,6 +55,13 @@ const recent = notes.slice(0, 10);
         {notes.length === 1 ? "note planted so far" : "notes planted so far"}
       </span>
     </div>
+  </section>
+
+  <section class="mb-12">
+    <p class="text-faint mb-3 font-mono text-[11px] leading-6 tracking-[0.11em] uppercase">
+      Activity
+    </p>
+    <Heatmap notes={notes} />
   </section>
 
   <section class="mb-12">

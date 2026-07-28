@@ -1,0 +1,140 @@
+---
+import { activityCalendar } from "../lib/garden.mjs";
+
+const { notes } = Astro.props;
+const { columns, monthLabels } = activityCalendar(notes);
+
+// Fixed buckets rather than max-relative: with a young garden the scale would
+// swing wildly as the busiest day changes. Squares stay sharp — the notebook
+// theme's ruled grid fights rounded corners.
+const level = (day) => {
+  if (day.future) return -1;
+  if (day.count === 0) return 0;
+  if (day.count === 1) return 1;
+  if (day.count === 2) return 2;
+  if (day.count <= 4) return 3;
+  return 4;
+};
+
+const days = columns.flat();
+const cols = columns.length;
+
+const label = (day) => {
+  const d = new Date(`${day.date}T00:00:00`).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+  const n = day.count === 1 ? "1 note" : `${day.count} notes`;
+  return `${d} · ${day.count === 0 ? "no notes" : n}`;
+};
+---
+
+<div class="hm-wrap" style={`--cols:${cols}`}>
+  <div class="hm-cal">
+    <div class="hm-months">
+      {
+        monthLabels.map((m) => (
+          <span class="hm-month" style={`grid-column:${m.col + 1}`}>
+            {m.label}
+          </span>
+        ))
+      }
+    </div>
+    <div class="hm-grid">
+      {
+        days.map((day) => {
+          const lv = level(day);
+          return (
+            <span
+              class="hm-day"
+              data-level={lv}
+              title={lv === -1 ? undefined : label(day)}
+            />
+          );
+        })
+      }
+    </div>
+  </div>
+  <div class="hm-legend">
+    <span>Less</span>
+    <span class="hm-day" data-level="0"></span>
+    <span class="hm-day" data-level="1"></span>
+    <span class="hm-day" data-level="2"></span>
+    <span class="hm-day" data-level="3"></span>
+    <span class="hm-day" data-level="4"></span>
+    <span>More</span>
+  </div>
+</div>
+
+<style>
+  .hm-wrap {
+    --sq: 13px;
+    --gap: 3px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  .hm-cal {
+    display: inline-block;
+    min-width: 100%;
+  }
+  .hm-months {
+    display: grid;
+    grid-template-columns: repeat(var(--cols), var(--sq));
+    gap: var(--gap);
+    margin-bottom: 5px;
+  }
+  .hm-month {
+    grid-row: 1;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    line-height: 1;
+    color: var(--faint);
+    white-space: nowrap;
+  }
+  .hm-grid {
+    display: grid;
+    grid-template-rows: repeat(7, var(--sq));
+    grid-auto-columns: var(--sq);
+    grid-auto-flow: column;
+    gap: var(--gap);
+  }
+  .hm-day {
+    width: var(--sq);
+    height: var(--sq);
+    box-shadow: inset 0 0 0 1px var(--line-soft);
+  }
+  .hm-day[data-level="0"] {
+    background: var(--sunk);
+  }
+  .hm-day[data-level="1"] {
+    background: var(--accent-soft);
+  }
+  .hm-day[data-level="2"] {
+    background: color-mix(in srgb, var(--accent) 45%, var(--accent-soft));
+  }
+  .hm-day[data-level="3"] {
+    background: color-mix(in srgb, var(--accent) 72%, var(--accent-soft));
+  }
+  .hm-day[data-level="4"] {
+    background: var(--accent);
+  }
+  .hm-day[data-level="-1"] {
+    visibility: hidden;
+  }
+  .hm-legend {
+    display: flex;
+    align-items: center;
+    gap: var(--gap);
+    margin-top: 8px;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--faint);
+  }
+  .hm-legend span:first-child {
+    margin-right: 2px;
+  }
+  .hm-legend span:last-child {
+    margin-left: 2px;
+  }
+</style>
