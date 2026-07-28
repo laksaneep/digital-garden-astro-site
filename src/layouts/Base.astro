@@ -8,7 +8,10 @@ const path = Astro.url.pathname;
 
 const navLink =
   "flex h-8 items-center px-2.5 text-sm text-muted no-underline hover:text-accent";
-const navLinkActive = "text-ink shadow-[inset_0_-2px_0_var(--accent)]";
+// Desktop keeps the drawn underline; the mobile bottom bar highlights the
+// active tab with a round accent pill behind the icon instead.
+const navLinkActive =
+  "md:text-ink md:shadow-[inset_0_-2px_0_var(--accent)] max-md:bg-accent-soft max-md:text-accent";
 ---
 
 <!doctype html>
@@ -44,26 +47,97 @@ const navLinkActive = "text-ink shadow-[inset_0_-2px_0_var(--accent)]";
           class="font-display text-ink text-[17px] font-semibold tracking-[-0.01em] no-underline"
           href="/">what i've learned today</a
         >
-        <hr class="border-line-soft m-0 flex-1 border-0 border-t" />
-        <nav class="flex items-center gap-1">
+        <hr class="border-line-soft m-0 hidden flex-1 border-0 border-t md:block" />
+        <nav
+          class="border-line bg-raised fixed inset-x-0 bottom-5 z-40 mx-auto flex w-fit items-center gap-0.5 rounded-full border px-2.5 py-1.5 shadow-[0_10px_30px_rgba(0,0,0,0.18)] md:static md:mx-0 md:w-auto md:gap-1 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none"
+        >
           <a
             href="/notes"
-            class={cn(navLink, path.startsWith("/notes") && navLinkActive)}
+            aria-label="Notes"
+            class={cn(
+              navLink,
+              "max-md:size-9 max-md:justify-center max-md:rounded-full max-md:px-0",
+              path.startsWith("/notes") && navLinkActive,
+            )}
             aria-current={path.startsWith("/notes") ? "page" : undefined}
-            >notes</a
           >
+            <svg
+              class="size-[18px] md:hidden"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+              ></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <line x1="10" y1="9" x2="8" y2="9"></line>
+            </svg>
+            <span class="hidden md:inline">notes</span>
+          </a>
           <a
             href="/tags"
-            class={cn(navLink, path.startsWith("/tags") && navLinkActive)}
+            aria-label="Tags"
+            class={cn(
+              navLink,
+              "max-md:size-9 max-md:justify-center max-md:rounded-full max-md:px-0",
+              path.startsWith("/tags") && navLinkActive,
+            )}
             aria-current={path.startsWith("/tags") ? "page" : undefined}
-            >tags</a
           >
+            <svg
+              class="size-[18px] md:hidden"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+              ></path>
+              <line x1="7" y1="7" x2="7.01" y2="7"></line>
+            </svg>
+            <span class="hidden md:inline">tags</span>
+          </a>
+          <a
+            href="/"
+            aria-label="Home"
+            aria-current={path === "/" ? "page" : undefined}
+            class={cn(
+              "flex size-9 items-center justify-center rounded-full md:hidden",
+              path === "/"
+                ? "bg-accent-soft text-accent"
+                : "text-muted hover:text-accent",
+            )}
+          >
+            <svg
+              class="size-[18px]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M3 10.2 12 3l9 7.2"></path>
+              <path d="M5.5 9.3V20a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1V9.3"></path>
+              <path d="M9.5 21v-5.5a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1V21"></path>
+            </svg>
+          </a>
           <Search />
           <button
             id="theme-toggle"
             type="button"
             aria-label="Switch theme"
-            class="bg-raised border-line text-muted hover:border-accent hover:text-accent ml-1 flex size-8 cursor-pointer items-center justify-center border p-0"
+            class="bg-raised border-line text-muted hover:border-accent hover:text-accent ml-1 flex size-8 cursor-pointer items-center justify-center border p-0 max-md:size-9 max-md:rounded-full max-md:border-0 max-md:bg-transparent"
           >
             <svg
               class="icon-moon block size-4"
