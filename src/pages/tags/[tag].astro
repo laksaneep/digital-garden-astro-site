@@ -1,0 +1,37 @@
+---
+import Base from "../../layouts/Base.astro";
+import NoteList from "../../components/NoteList.astro";
+import { getNotes, tagCounts } from "../../lib/garden.mjs";
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return tagCounts(notes).map((tag) => ({
+    params: { tag: tag.slug },
+    props: {
+      name: tag.name,
+      notes: notes.filter((n) => n.data.tags.includes(tag.name)),
+    },
+  }));
+}
+
+const { name, notes } = Astro.props;
+---
+
+<Base title={`#${name} — What I've learned today`}>
+  <h1
+    class="font-display mt-12 mb-6 text-[32px] leading-12 font-semibold tracking-[-0.02em] text-balance max-[520px]:text-[26px]"
+  >
+    {name}
+  </h1>
+  <p class="text-muted mb-12 max-w-[54ch]">
+    {notes.length} {notes.length === 1 ? "note" : "notes"} tagged
+    <span class="font-mono text-[0.9em]">{name}</span>, newest first.
+  </p>
+
+  <NoteList notes={notes} />
+
+  <a
+    class="text-muted hover:text-accent mt-12 inline-block text-sm no-underline"
+    href="/tags">← all tags</a
+  >
+</Base>

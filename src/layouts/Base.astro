@@ -51,6 +51,12 @@ const navLinkActive = "text-ink shadow-[inset_0_-2px_0_var(--accent)]";
             aria-current={path.startsWith("/notes") ? "page" : undefined}
             >notes</a
           >
+          <a
+            href="/tags"
+            class={cn(navLink, path.startsWith("/tags") && navLinkActive)}
+            aria-current={path.startsWith("/tags") ? "page" : undefined}
+            >tags</a
+          >
           <button
             id="theme-toggle"
             type="button"

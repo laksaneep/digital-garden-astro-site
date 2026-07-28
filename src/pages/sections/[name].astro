@@ -1,0 +1,38 @@
+---
+import Base from "../../layouts/Base.astro";
+import NoteList from "../../components/NoteList.astro";
+import { getNotes, sectionCounts, titleCase } from "../../lib/garden.mjs";
+
+export async function getStaticPaths() {
+  const notes = await getNotes();
+  return sectionCounts(notes).map((section) => ({
+    params: { name: section.slug },
+    props: {
+      name: section.name,
+      notes: notes.filter((n) => n.section === section.name),
+    },
+  }));
+}
+
+const { name, notes } = Astro.props;
+const heading = titleCase(name);
+---
+
+<Base title={`${heading} — What I've learned today`}>
+  <h1
+    class="font-display mt-12 mb-6 text-[32px] leading-12 font-semibold tracking-[-0.02em] text-balance max-[520px]:text-[26px]"
+  >
+    {heading}
+  </h1>
+  <p class="text-muted mb-12 max-w-[54ch]">
+    {notes.length} {notes.length === 1 ? "note" : "notes"} in this section,
+    newest first.
+  </p>
+
+  <NoteList notes={notes} />
+
+  <a
+    class="text-muted hover:text-accent mt-12 inline-block text-sm no-underline"
+    href="/notes">← all notes</a
+  >
+</Base>

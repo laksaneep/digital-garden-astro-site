@@ -1,4 +1,5 @@
 import { getCollection } from "astro:content";
+import { slugify } from "./slug.mjs";
 
 /** Published notes only, newest first. Drafts never reach the site. */
 export async function getNotes() {
@@ -7,7 +8,10 @@ export async function getNotes() {
     .map((note) => ({
       ...note,
       section: note.id.includes("/") ? note.id.split("/")[0] : "unfiled",
-      slug: note.id.split("/").pop().replace(/\.md$/, ""),
+      // Slugify the filename so notes can be named naturally in Obsidian
+      // ("A static site doesn't need a database.md") and still resolve to a
+      // clean URL that matches how [[wikilinks]] slugify the same title.
+      slug: slugify(note.id.split("/").pop().replace(/\.md$/, "")),
     }))
     // Title breaks ties: notes written the same day would otherwise order
     // differently between builds, producing noisy diffs in the output.
@@ -18,14 +22,31 @@ export async function getNotes() {
     );
 }
 
-/** Section names with note counts, biggest first. */
+/**
+ * Section names with note counts, biggest first. Each carries its URL slug,
+ * so an Obsidian folder named "System Design" resolves to /sections/system-design
+ * while the raw name stays available for the display heading.
+ */
 export function sectionCounts(notes) {
   const counts = new Map();
   for (const note of notes) {
     counts.set(note.section, (counts.get(note.section) ?? 0) + 1);
   }
   return [...counts.entries()]
-    .map(([name, count]) => ({ name, count }))
+    .map(([name, count]) => ({ name, slug: slugify(name), count }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+/** Tag names with note counts, biggest first. Each carries its URL slug. */
+export function tagCounts(notes) {
+  const counts = new Map();
+  for (const note of notes) {
+    for (const tag of note.data.tags) {
+      counts.set(tag, (counts.get(tag) ?? 0) + 1);
+    }
+  }
+  return [...counts.entries()]
+    .map(([name, count]) => ({ name, slug: slugify(name), count }))
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 }
 
