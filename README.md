@@ -27,12 +27,6 @@ npm run build    # clean + sync + astro build + pagefind index
 npm run preview  # serve the built site (needed to test search)
 ```
 
-## Gotchas
-
-- **Search only works on the _built_ site.** Pagefind indexes `dist/` after `astro build`, so search is inert under `npm run dev` — use `npm run build && npm run preview` to test it.
-- **The content cache.** Astro caches rendered markdown in `node_modules/.astro/data-store.json`. Editing a remark plugin does **not** invalidate it (`rm -rf .astro` isn't enough — the store lives under `node_modules/`). `npm run build` runs `npm run clean` first; if a plugin edit seems ignored in dev, run `npm run clean`.
-- **A bad note fails the whole build.** Every note's frontmatter is validated at build, not just published ones — one malformed `created` date blocks the deploy.
-
 ## Layout
 
 ```
