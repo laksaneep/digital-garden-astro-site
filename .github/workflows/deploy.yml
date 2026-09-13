@@ -19,18 +19,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out the site
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Check out the garden (private notes repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           repository: laksaneep/digital-garden
           token: ${{ secrets.GARDEN_TOKEN }}
           path: garden
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
