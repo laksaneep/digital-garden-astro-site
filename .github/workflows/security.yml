@@ -39,3 +39,37 @@ jobs:
         if: always() # upload even if the scan step errored
         with:
           sarif_file: trivy-results.sarif
+          # Distinct category per tool, so Trivy and Semgrep results don't
+          # overwrite each other in the Security tab.
+          category: trivy
+
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install semgrep
+
+      - name: Semgrep SAST scan
+        # Explicit community rulesets (not --config auto), so no project code is
+        # sent to the registry beyond fetching the rules; --metrics off keeps it
+        # quiet. Report-only like Trivy: continue-on-error so findings never fail
+        # the run — they surface in the Security tab instead.
+        continue-on-error: true
+        run: >
+          semgrep scan
+          --config p/security-audit
+          --config p/secrets
+          --sarif --output semgrep-results.sarif
+          --metrics off
+
+      - name: Upload results to the Security tab
+        uses: github/codeql-action/upload-sarif@v3
+        if: always() # upload even if the scan step errored
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
