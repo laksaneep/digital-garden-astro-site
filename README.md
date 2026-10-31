@@ -1,70 +1,45 @@
-# Digital-garden-astro-site
+# 🌱 What I've Learned Today
 
-The Astro site for "What I've learned today". Code only — **no notes live here.**
+> My garden — where I plant the little things I learn, one day at a time.
 
-Notes come from a separate private repo (the Obsidian garden vault). They are
-copied into `src/content/notes/` at build time, and that folder is git-ignored.
-Live at https://what-i-have-learned.pages.dev.
+🔗 **Come wander around at [what-i-have-learned.pages.dev](https://what-i-have-learned.pages.dev)**
 
-## What it does
+---
 
-- **Wikilinks & backlinks** — `[[Note title]]` becomes a real link; each note lists what links to it.
-- **Obsidian callouts** — `> [!note]` renders as a styled `<aside>`.
-- **Sections & tags** — a folder is a section (`/sections/[name]`); tags get `/tags` + `/tags/[tag]`. Section/tag/note slugs are all slugified, so files and folders can be named naturally in Obsidian.
-- **Full-text search** — Pagefind, opened via the nav button or ⌘K. The only client-side JS.
-- **Activity heatmap** — a GitHub-style contribution graph on the home page (pure CSS, no library).
-- **Theme** — light/dark toggle, grid-notebook aesthetic.
-- **Responsive nav** — top bar on desktop; a floating icon bottom bar on mobile.
+## This is my garden 🪴
 
-Static output, ~0 KB JS except the search runtime (loaded lazily on first open).
+Every day we learn *something* — sometimes it's a big idea, sometimes it's a tiny
+detail that slips away the moment we blink. This is where I keep those things
+before they disappear.
 
-## Running it
+It's not a blog. It's not a tidy archive. It's a **garden** —
+a place where thoughts sprout, grow, and every now and then surprise me by
+reaching out and connecting to one another.
 
-```bash
-npm install
-npm run dev      # syncs notes, then starts the dev server
-npm run build    # clean + sync + astro build + pagefind index
-npm run preview  # serve the built site (needed to test search)
-```
+## No perfection required ✨
 
-## Layout
+Some notes aren't finished. Some are just a thought passing through.
+Some are wrong, and get fixed later — **and that's completely okay.**
 
-```
-src/
-├── content.config.ts       frontmatter schema (title/published/created/updated/tags)
-├── lib/
-│   ├── garden.mjs          published filter, section/tag counts, month grouping,
-│   │                       backlinks, activity calendar
-│   ├── slug.mjs            title -> slug, shared by wikilinks and routing
-│   ├── wikilinks.mjs       [[Note title]] -> real links
-│   ├── callouts.mjs        > [!note] -> <aside class="callout">
-│   └── utils.ts            cn() — clsx + tailwind-merge
-├── layouts/Base.astro      header, nav (+ mobile bottom bar), theme toggle
-├── components/
-│   ├── NoteList.astro      notes grouped by month
-│   ├── Search.astro        Pagefind ⌘K modal
-│   └── Heatmap.astro       activity contribution graph
-├── pages/
-│   ├── index.astro         sections, note count, activity, recent
-│   ├── notes/
-│   │   ├── index.astro     all notes by month
-│   │   └── [slug].astro    one note + backlinks
-│   ├── sections/[name].astro   notes in a section
-│   └── tags/
-│       ├── index.astro     all tags
-│       └── [tag].astro     notes with a tag
-└── styles/global.css       Tailwind import, palette, @theme tokens
+This is a space to **try · fail · learn**.
+No note has to wait until it's "ready" before it gets to see the light,
+because knowledge planted out in the open grows better than knowledge
+tucked away in a drawer.
 
-.github/workflows/
-├── deploy.yml              sync garden + build + deploy to Cloudflare Pages
-└── security.yml            Trivy scan -> GitHub Security tab
-```
+## Why I grow this garden 💭
 
-## Deploy
+- **To remember** — my brain forgets easily; the garden doesn't.
+- **To think** — writing something down is thinking it through one more time.
+- **To connect** — today's lesson often shakes hands with yesterday's.
+- **To share** — maybe what I learned turns out to be useful to someone else.
 
-On Cloudflare Pages
+## Come take a stroll 🚶
 
-## Security
+Browse every note, follow the sections and tags you care about,
+trace the threads of thought that link together, or just search for
+whatever you're curious about.
 
-`security.yml` runs Trivy (deps + secrets + misconfig, CRITICAL/HIGH) on every
-push/PR and weekly.
+> The garden keeps growing every day — show up early and you might catch
+> a seedling that was only planted this morning. 🌿
+
+🔗 **[what-i-have-learned.pages.dev](https://what-i-have-learned.pages.dev)**
