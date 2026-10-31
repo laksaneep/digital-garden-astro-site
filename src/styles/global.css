@@ -208,6 +208,45 @@
   .wl:hover {
     @apply border-accent;
   }
+  /* Headings: Tailwind's preflight resets these to body text, so the markdown
+     body needs its own scale. Kept below the layout's page title (32px). */
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4 {
+    @apply font-display font-semibold;
+    line-height: 1.25;
+  }
+  .prose h1 {
+    @apply mt-10 mb-4 text-[26px] tracking-[-0.02em];
+  }
+  .prose h2 {
+    @apply mt-10 mb-3 text-[21px] tracking-[-0.01em];
+  }
+  .prose h3 {
+    @apply mt-8 mb-2 text-[17px];
+  }
+  .prose h4 {
+    @apply mt-6 mb-2 text-[15px];
+  }
+  /* Don't push the body down when it opens with a heading. */
+  .prose > :first-child {
+    @apply mt-0;
+  }
+  /* GFM tables. display:block + overflow-x lets a wide table scroll on mobile
+     instead of blowing out the page width. */
+  .prose table {
+    @apply mb-6 w-full border-collapse text-[14.5px];
+    display: block;
+    overflow-x: auto;
+  }
+  .prose th,
+  .prose td {
+    @apply border-line border px-3 py-2 text-left align-top;
+  }
+  .prose th {
+    @apply bg-sunk font-display font-semibold;
+  }
 
   .callout {
     @apply border-accent-soft bg-sunk mb-6 border px-4 py-3;
