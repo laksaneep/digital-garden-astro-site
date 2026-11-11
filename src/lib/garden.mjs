@@ -1,9 +1,19 @@
 import { getCollection } from "astro:content";
 import { slugify } from "./slug.mjs";
 
+/**
+ * A top-level vault folder starting with "_" (e.g. _assets, _templates) is
+ * private plumbing: it never becomes a section, and notes inside it never
+ * reach the site. Attachments in it still resolve for ![[image]] embeds.
+ */
+const isIgnored = (id) => id.split("/")[0].startsWith("_");
+
 /** Published notes only, newest first. Drafts never reach the site. */
 export async function getNotes() {
-  const notes = await getCollection("notes", ({ data }) => data.published === true);
+  const notes = await getCollection(
+    "notes",
+    ({ id, data }) => data.published === true && !isIgnored(id),
+  );
   return notes
     .map((note) => ({
       ...note,

@@ -26,13 +26,21 @@ const isHidden = (src) =>
     .split(sep)
     .some((segment) => segment.startsWith("."));
 
+// Attachments (pasted images etc.) come along too: src/lib/embeds.mjs resolves
+// ![[image.png]] against these copies and Astro's image pipeline optimises them.
 await cp(source, dest, {
   recursive: true,
   filter: (src) => !isHidden(src),
 });
 
 const sections = (await readdir(dest, { withFileTypes: true }))
-  .filter((d) => d.isDirectory())
+  // "_"-prefixed folders (e.g. _assets) are never sections; see src/lib/garden.mjs.
+  .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
   .map((d) => d.name);
 
-console.log(`  synced ${sections.length} sections from ${source}`);
+const IMAGE = /\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i;
+const images = (await readdir(dest, { recursive: true })).filter((f) => IMAGE.test(f));
+
+console.log(
+  `  synced ${sections.length} sections and ${images.length} images from ${source}`,
+);
