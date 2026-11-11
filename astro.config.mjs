@@ -4,6 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { remarkObsidianTables } from "./src/lib/tables.mjs";
 import { remarkWikilinks } from "./src/lib/wikilinks.mjs";
 import { remarkCallouts } from "./src/lib/callouts.mjs";
+import { remarkEmbeds } from "./src/lib/embeds.mjs";
 
 export default defineConfig({
   site: "https://what-i-have-learned.pages.dev",
@@ -23,7 +24,8 @@ export default defineConfig({
     // Tables first: it lifts stray paragraphs out of tables before the others
     // run, so a rescued line still gets callout/wikilink treatment. Callouts
     // before wikilinks: it needs the marker line intact as a single text node,
-    // which the wikilink plugin would otherwise split apart.
-    remarkPlugins: [remarkObsidianTables, remarkCallouts, remarkWikilinks],
+    // which the wikilink plugin would otherwise split apart. Embeds before
+    // wikilinks: ![[image.png]] contains a [[...]] the wikilink plugin would grab.
+    remarkPlugins: [remarkObsidianTables, remarkCallouts, remarkEmbeds, remarkWikilinks],
   },
 });

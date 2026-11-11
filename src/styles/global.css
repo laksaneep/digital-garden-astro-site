@@ -262,6 +262,12 @@
     @apply bg-sunk font-display font-semibold;
   }
 
+  /* Obsidian ![[image]] embeds (src/lib/embeds.mjs). Preflight already makes
+     images block-level and caps them at the column width. */
+  .prose img {
+    @apply my-3;
+  }
+
   /* Obsidian callouts, from src/lib/callouts.mjs:
        <aside class="callout callout-TYPE"><p class="clabel">Title</p>…</aside>
      Each type sets only --c and --icon; tint and border derive from --c, so
