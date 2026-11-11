@@ -1,5 +1,6 @@
 import { getCollection } from "astro:content";
 import { slugify } from "./slug.mjs";
+import { wikilinkTargets } from "./wikilinks.mjs";
 
 /** Published notes only, newest first. Drafts never reach the site. */
 export async function getNotes() {
@@ -126,10 +127,18 @@ export function activityCalendar(notes, weeks = 53) {
   return { columns, monthLabels, max };
 }
 
-/** Notes whose body links to this one, via [[wikilink]]. */
+/**
+ * Notes whose body links to this one, via [[wikilink]]. Matched by file name,
+ * the way Obsidian resolves links, so it works whatever the note's title is
+ * and however the link is written ([[Note|alias]], [[Folder/Note#Heading]]).
+ * Links to a heading inside the same note ([[#Heading]]) don't count.
+ */
 export function backlinksTo(note, notes) {
-  const needle = `[[${note.data.title}`;
-  return notes.filter((other) => other.id !== note.id && other.body.includes(needle));
+  return notes.filter(
+    (other) =>
+      other.id !== note.id &&
+      wikilinkTargets(other.body ?? "").some((t) => t.slug === note.slug),
+  );
 }
 
 export const titleCase = (s) => s.charAt(0).toUpperCase() + s.slice(1);
