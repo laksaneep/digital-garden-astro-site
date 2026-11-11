@@ -34,7 +34,8 @@ await cp(source, dest, {
 });
 
 const sections = (await readdir(dest, { withFileTypes: true }))
-  .filter((d) => d.isDirectory())
+  // "_"-prefixed folders (e.g. _assets) are never sections; see src/lib/garden.mjs.
+  .filter((d) => d.isDirectory() && !d.name.startsWith("_"))
   .map((d) => d.name);
 
 const IMAGE = /\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i;
