@@ -2,7 +2,9 @@
    whatever body text follows. remark hands us the entire blockquote as a single
    text node with embedded newlines, so this has to split on \n itself rather
    than expecting separate nodes. */
-const CALLOUT = /^\[!(\w+)\]\s*([^\n]*)\n?([\s\S]*)$/;
+// [ \t]* rather than \s*: \s would swallow the newline after a bare
+// "[!note]" and promote the first body line to the title.
+const CALLOUT = /^\[!(\w+)\][ \t]*([^\n]*)\n?([\s\S]*)$/;
 
 /**
  * Turns Obsidian callouts into styled blocks.
@@ -38,7 +40,13 @@ export function remarkCallouts() {
       node.children.unshift({
         type: "paragraph",
         data: { hProperties: { className: "clabel" } },
-        children: [{ type: "text", value: title.trim() || type }],
+        children: [
+          {
+            type: "text",
+            value:
+              title.trim() || type.charAt(0).toUpperCase() + type.slice(1).toLowerCase(),
+          },
+        ],
       });
     }
   };
