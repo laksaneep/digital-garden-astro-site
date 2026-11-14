@@ -268,9 +268,10 @@
     @apply bg-sunk font-display font-semibold;
   }
 
-  /* Obsidian ![[image]] embeds (src/lib/embeds.mjs). Preflight already makes
+  /* Obsidian ![[image]] and ![[video]] embeds (src/lib/embeds.mjs). Preflight already makes
      images block-level and caps them at the column width. */
-  .prose img {
+  .prose img,
+  .prose video {
     @apply my-3;
   }
 

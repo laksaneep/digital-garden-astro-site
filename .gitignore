@@ -5,3 +5,5 @@ dist/
 
 # Notes are copied in from the garden repo at build time — never committed here.
 src/content/notes/
+# Videos from the notes, copied by scripts/sync-notes.mjs.
+public/media/
