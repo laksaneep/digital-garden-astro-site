@@ -125,6 +125,12 @@
    grid. Not expressible as a utility, so it stays here.
    ------------------------------------------------------------ */
 @layer base {
+  /* Keep anchor jumps (#heading links) clear of the sticky header: 72px header
+     plus one grid cell of breathing room. */
+  html {
+    scroll-padding-top: calc(var(--cell) * 4);
+  }
+
   body {
     color: var(--ink);
     font-family: var(--font-body);
