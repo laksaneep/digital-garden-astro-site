@@ -8,6 +8,9 @@ const NOTES_DIR = join(process.cwd(), "src", "content", "notes");
 
 const EMBED = /!\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|([^\]]*))?\]\]/g;
 const IMAGE_EXT = /\.(avif|bmp|gif|jpe?g|png|svg|webp)$/i;
+// Keep in sync with VIDEO in scripts/sync-notes.mjs, which copies these files
+// to public/ so they are served as-is.
+const VIDEO_EXT = /\.(mp4|m4v|webm|ogv|mov)$/i;
 const SIZE = /^(\d+)(?:x(\d+))?$/;
 
 /**
@@ -50,6 +53,9 @@ function resolve(target, noteDir, files) {
   );
 }
 
+const escapeAttr = (s) =>
+  s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
 /**
  * Turns Obsidian embeds into real images.
  *
@@ -57,11 +63,16 @@ function resolve(target, noteDir, files) {
  *   ![[diagram.png|300]]       -> same, 300px wide
  *   ![[diagram.png|300x200]]   -> same, 300x200
  *   ![[diagram.png|A caption]] -> alt text "A caption"
+ *   ![[clip.mp4]]              -> <video controls src="/media/.../clip.mp4">
+ *   ![[clip.mp4|400]]          -> same, 400px wide
  *
  * The image node points at the attachment's copy inside src/content/notes via a
  * relative path, so Astro's image pipeline picks it up, optimises it, and fails
  * loudly if it goes missing. An embed whose file isn't in the vault becomes its
  * plain file name and a build warning, rather than breaking the build.
+ *
+ * Videos can't go through the image pipeline, so sync-notes.mjs copies them to
+ * public/media/ and the embed becomes a <video> pointing there.
  *
  * Embeds of other notes (![[Some note]]) are rewritten to plain [[Some note]]
  * so the wikilink plugin turns them into links: we don't transclude notes.
@@ -93,7 +104,8 @@ export function remarkEmbeds() {
         }
         last = match.index + raw.length;
 
-        if (!IMAGE_EXT.test(target)) {
+        const isVideo = VIDEO_EXT.test(target);
+        if (!isVideo && !IMAGE_EXT.test(target)) {
           // A note (or a PDF/audio/etc. we don't render): drop the "!" so it
           // becomes an ordinary wikilink.
           children.push({ type: "text", value: raw.slice(1) });
@@ -109,6 +121,25 @@ export function remarkEmbeds() {
         }
 
         const size = option?.trim().match(SIZE);
+
+        if (isVideo) {
+          const src = "/media/" + found.split("/").map(encodeURIComponent).join("/");
+          const label = size || !option?.trim()
+            ? posix.basename(target).replace(VIDEO_EXT, "")
+            : option.trim();
+          const attrs = [
+            `src="${src}"`,
+            `aria-label="${escapeAttr(label)}"`,
+            size && `width="${size[1]}"`,
+            size?.[2] && `height="${size[2]}"`,
+          ].filter(Boolean).join(" ");
+          children.push({
+            type: "html",
+            value: `<video controls preload="metadata" playsinline ${attrs}></video>`,
+          });
+          continue;
+        }
+
         const alt = size || !option?.trim()
           ? posix.basename(target).replace(IMAGE_EXT, "")
           : option.trim();
