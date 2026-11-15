@@ -237,17 +237,30 @@
     @apply font-display font-semibold;
     line-height: 1.25;
   }
+  /* Colour steps from the accent toward --ink as the level drops, so headings
+     stand apart from bold body text and the hierarchy shows in colour as well
+     as size. Mixed from theme variables, so light/dark follow on their own. */
   .prose h1 {
-    @apply mt-10 mb-4 text-[26px] tracking-[-0.02em];
+    @apply mt-10 mb-4 text-[28px] tracking-[-0.02em];
+    color: var(--accent);
   }
   .prose h2 {
-    @apply mt-10 mb-3 text-[21px] tracking-[-0.01em];
+    @apply mt-10 mb-3 text-[24px] tracking-[-0.01em];
+    color: color-mix(in oklab, var(--accent) 75%, var(--ink));
   }
   .prose h3 {
-    @apply mt-8 mb-2 text-[17px];
+    @apply mt-8 mb-2 text-[20px];
+    color: color-mix(in oklab, var(--accent) 50%, var(--ink));
   }
   .prose h4 {
-    @apply mt-6 mb-2 text-[15px];
+    @apply mt-6 mb-2 text-[18px];
+    color: color-mix(in oklab, var(--accent) 30%, var(--ink));
+  }
+  /* Bold text matches the headings' weight. Preflight sets <strong> to
+     "bolder" (700), which reads heavier than the 600 headings. */
+  .prose strong,
+  .prose b {
+    font-weight: 600;
   }
   /* Don't push the body down when it opens with a heading. */
   .prose > :first-child {
@@ -292,6 +305,7 @@
     /* Body text leans toward the type's hue, less than the title does, so the
        box reads as one colour family while staying easy to read. */
     color: color-mix(in oklab, var(--c) 55%, var(--ink));
+    @apply text-base font-normal;
   }
   .callout code {
     background-color: color-mix(in srgb, var(--c) 12%, transparent);
@@ -322,7 +336,7 @@
     @apply mt-3;
   }
   .callout .clabel {
-    @apply font-display flex items-center gap-2 text-[18px] font-bold;
+    @apply font-display flex items-center gap-2 text-[16px] font-semibold;
     color: color-mix(in oklab, var(--c) 70%, var(--ink));
   }
   .callout .clabel::before {
