@@ -30,9 +30,9 @@
   --line: #d9dfe7;
   --line-soft: #e6eaef;
   /* callout hues; --accent doubles as the note colour */
-  --tip: #3b7a52;
-  --info: #3a6ca3;
-  --warn: #9a6a08;
+  --tip: #5a8763;
+  --info: #5b7c9c;
+  --warn: #a8782a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -49,9 +49,9 @@
     --accent-soft: #483026;
     --line: #2a323a;
     --line-soft: #222930;
-    --tip: #7cc49a;
-    --info: #85b4e8;
-    --warn: #e2b458;
+    --tip: #93bf9c;
+    --info: #98b2cc;
+    --warn: #d8b06a;
   }
 }
 
@@ -68,9 +68,9 @@
   --accent-soft: #483026;
   --line: #2a323a;
   --line-soft: #222930;
-  --tip: #7cc49a;
-  --info: #85b4e8;
-  --warn: #e2b458;
+  --tip: #93bf9c;
+  --info: #98b2cc;
+  --warn: #d8b06a;
 }
 
 :root[data-theme="light"] {
@@ -87,9 +87,9 @@
   --line: #d9dfe7;
   --line-soft: #e6eaef;
   /* callout hues; --accent doubles as the note colour */
-  --tip: #3b7a52;
-  --info: #3a6ca3;
-  --warn: #9a6a08;
+  --tip: #5a8763;
+  --info: #5b7c9c;
+  --warn: #a8782a;
 }
 
 /* ─── Design tokens ─────────────────────────────────────────
@@ -277,17 +277,24 @@
 
   /* Obsidian callouts, from src/lib/callouts.mjs:
        <aside class="callout callout-TYPE"><p class="clabel">Title</p>…</aside>
-     Each type sets only --c and --icon; tint and border derive from --c, so
-     they follow light/dark on their own. 25% of a hue over the ground is how
-     --accent-soft is built, so a note keeps the original look. Unknown types
-     fall back to the note style. */
+     Each type sets only --c and --icon; tint, border and title colour derive
+     from --c, so they follow light/dark on their own. The tint sits on the
+     opaque --raised colour so the grid doesn't show through the box, and the
+     title is pulled toward --ink so cool hues (info, tip) still sit with the
+     warm brown body text. Unknown types fall back to the note style. */
   .callout {
     --c: var(--accent);
     --icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 20h9'/><path d='M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z'/></svg>");
     @apply mb-6 border px-4 py-3;
-    border-color: color-mix(in srgb, var(--c) 25%, var(--ground));
-    background-color: color-mix(in srgb, var(--c) 6%, transparent);
-    box-shadow: inset 3px 0 0 var(--c);
+    border-color: color-mix(in srgb, var(--c) 16%, var(--ground));
+    background-color: color-mix(in srgb, var(--c) 7%, var(--raised));
+    box-shadow: inset 3px 0 0 color-mix(in srgb, var(--c) 75%, var(--ground));
+    /* Body text leans toward the type's hue, less than the title does, so the
+       box reads as one colour family while staying easy to read. */
+    color: color-mix(in oklab, var(--c) 55%, var(--ink));
+  }
+  .callout code {
+    background-color: color-mix(in srgb, var(--c) 12%, transparent);
   }
   .callout-tip,
   .callout-hint,
@@ -315,13 +322,13 @@
     @apply mt-3;
   }
   .callout .clabel {
-    @apply font-display flex items-center gap-2 text-sm font-semibold;
-    color: var(--c);
+    @apply font-display flex items-center gap-2 text-[18px] font-bold;
+    color: color-mix(in oklab, var(--c) 70%, var(--ink));
   }
   .callout .clabel::before {
     content: "";
     @apply size-4 shrink-0;
-    background-color: currentColor;
+    background-color: var(--c);
     -webkit-mask: var(--icon) no-repeat center / contain;
     mask: var(--icon) no-repeat center / contain;
   }
